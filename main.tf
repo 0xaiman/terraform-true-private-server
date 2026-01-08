@@ -11,13 +11,13 @@ terraform {
 
 # Configure the AWS Provider
 provider "aws" {
-  region = "ap-southeast-1"
+  region = var.aws_region
 }
 
 # 1) Create a VPC
 resource "aws_vpc" "vpc_saya" {
 
-  cidr_block = "10.0.0.0/16"
+  cidr_block = var.vpc_cidr
   tags = {
     Name = "VPC Saya"
   }
@@ -29,7 +29,7 @@ resource "aws_vpc" "vpc_saya" {
 # ii) Even for a private VM, this is mandatory.
 resource "aws_subnet" "subnet_saya" {
   vpc_id     = aws_vpc.vpc_saya.id
-  cidr_block = "10.0.1.0/24"
+  cidr_block = var.subnet_cidr
 
   tags = {
     Name = "Subnet Saya"
@@ -69,8 +69,8 @@ resource "aws_security_group" "security_group_saya" {
 # ii)Must be in the subnet and reference the SG.
 # iii) For a “true private server”, no public IP.
 resource "aws_instance" "instance_saya" {
-  ami                         = "ami-00d8fc944fb171e29"
-  instance_type               = "t3.micro"
+  ami                         = var.ami_id
+  instance_type               = var.instance_type
   subnet_id                   = aws_subnet.subnet_saya.id
   vpc_security_group_ids      = [aws_security_group.security_group_saya.id]
   associate_public_ip_address = false
