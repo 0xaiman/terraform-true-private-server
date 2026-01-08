@@ -28,3 +28,8 @@ variable "ami_id" {
   default = "ami-00d8fc944fb171e29"
 }
 
+variable "bucket_name" {
+  type    = string
+  default = "bucket-saya-789"
+}
+

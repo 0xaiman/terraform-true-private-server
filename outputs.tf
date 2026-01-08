@@ -23,4 +23,9 @@ output "instance_private_ip" {
   value       = aws_instance.instance_saya.private_ip
 }
 
+output "backend_bucket_name" {
+  description = "The name of the S3 bucket used for backend"
+  value       = "bucket-saya-789"
+}
+
 

@@ -1,6 +1,15 @@
 # All resources live here initially
 
 terraform {
+
+  backend "s3" {
+    bucket  = "bucket-saya-789"
+    key     = "private-vm/terraform.tfstate"
+    region  = "ap-southeast-1"
+    encrypt = true
+
+
+  }
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -79,3 +88,5 @@ resource "aws_instance" "instance_saya" {
     Name = "Instance Saya"
   }
 }
+
+#
