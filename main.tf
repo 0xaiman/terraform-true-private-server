@@ -1,3 +1,4 @@
+
 # All resources live here initially
 
 terraform {
@@ -56,7 +57,7 @@ resource "aws_security_group" "security_group_saya" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["10.0.0.0/16"] # Only inside VPC
+    cidr_blocks = ["0.0.0.0/0"] # Allow SSH from anywhere (not secure for production)
   }
 
   egress {
@@ -82,11 +83,46 @@ resource "aws_instance" "instance_saya" {
   instance_type               = var.instance_type
   subnet_id                   = aws_subnet.subnet_saya.id
   vpc_security_group_ids      = [aws_security_group.security_group_saya.id]
-  associate_public_ip_address = false
+  associate_public_ip_address = true
+  key_name                    = aws_key_pair.aiman.key_name
 
   tags = {
     Name = "Instance Saya"
   }
 }
+# Create an Internet Gateway
+resource "aws_internet_gateway" "igw_saya" {
+  vpc_id = aws_vpc.vpc_saya.id
+
+  tags = {
+    Name = "IGW Saya"
+  }
+}
+
+# Create a route table
+resource "aws_route_table" "rt_saya" {
+  vpc_id = aws_vpc.vpc_saya.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw_saya.id
+  }
+
+  tags = {
+    Name = "RT Saya"
+  }
+}
+
+# Associate the route table with your subnet
+resource "aws_route_table_association" "rta_saya" {
+  subnet_id      = aws_subnet.subnet_saya.id
+  route_table_id = aws_route_table.rt_saya.id
+}
+
+resource "aws_key_pair" "aiman" {
+  key_name   = "aiman-ec2-key"
+  public_key = file("~/.ssh/aiman-ec2-key.pub")
+}
+
 
 #
